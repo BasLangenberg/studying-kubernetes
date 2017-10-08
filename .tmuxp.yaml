@@ -1,0 +1,29 @@
+session_name: k8s-study
+windows:
+- window_name: work
+  panes:
+    - kubectl list cluster
+- window_name: docs
+  panes:
+    - vim /vagrant/readme.md
+- window_name: controller0
+  panes:
+    - ssh controller0
+- window_name: controller1
+  panes:
+    - ssh controller1
+- window_name: controller2
+  panes:
+    - ssh controller2
+- window_name: worker0
+  panes:
+    - ssh worker0
+- window_name: worker1
+  panes:
+    - ssh worker1
+- window_name: worker2
+  panes:
+    - ssh worker2
+- window_name: load-balancer
+  panes:
+    - ssh load-balancer
