@@ -2,7 +2,7 @@ session_name: k8s-study
 windows:
 - window_name: work
   panes:
-    - kubectl list cluster
+    - kubectl get cluster
 - window_name: docs
   panes:
     - vim /vagrant/readme.md
