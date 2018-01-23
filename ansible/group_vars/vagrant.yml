@@ -1,0 +1,11 @@
+---
+workers:
+  worker0:
+    hostname: worker0
+    ipaddress: 192.168.2.5
+  worker1:
+    hostname: worker1
+    ipaddress: 192.168.2.6 
+  worker2:
+    hostname: worker2
+    ipaddress: 192.168.2.7

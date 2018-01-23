@@ -1,2 +1,3 @@
 ---
 # vars file for manage-certs
+ca_base: /etc/k8s-ca

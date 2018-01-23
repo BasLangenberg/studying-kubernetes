@@ -6,24 +6,44 @@
     path: "{{item}}"
     state: directory
   with_items:
-    - /etc/k8s-ca
-    - /etc/k8s-ca/ca
-    - /etc/k8s-ca/config
-    - /etc/k8s-ca/issued
+    - "{{ ca_base }}"
+    - "{{ ca_base }}/ca"
+    - "{{ ca_base }}/config"
+    - "{{ ca_base }}/issued"
 
 - name: copy ca config
   copy:
     src: "{{item}}"
-    dest: "/etc/k8s-ca/config/{{item}}" 
+    dest: "{{ ca_base }}/config/{{item}}" 
   with_items:
     - ca-config.json
     - ca-csr.json
+    - admin-csr.json
+
+- name: parse worker configs
+  template:
+    src: worker.json.j2
+    dest: "{{ ca_base }}/config/{{ item.value.hostname }}-csr.json"
+  with_dict: "{{ workers }}"
 
 - name : check if ca exists
   stat:
-    path: /etc/k8s-ca/ca/ca.pem
+    path: "{{ ca_base }}/ca/ca.pem"
   register: ca_file
 
+- name : check if admin certificates exists
+  stat:
+    path: "{{ ca_base }}/issued/admin.pem"
+  register: admin_file
+
 - name: generate ca
-  shell: cfssl gencert -initca /etc/k8s-ca/config/ca-csr.json | cfssljson -bare /etc/k8s-ca/ca/ca
+  shell: "cfssl gencert -initca {{ ca_base }}/config/ca-csr.json | cfssljson -bare {{ ca_base }}/ca/ca"
   when: not ca_file.stat.exists
+
+- name: generate admin certificate
+  shell: "cfssl gencert -ca={{ ca_base }}/ca/ca.pem -ca-key={{ ca_base }}/ca/ca-key.pem -config={{ ca_base }}/config/ca-config.json -profile=kubernetes {{ ca_base}}/config/admin-csr.json | cfssljson -bare {{ ca_base}}/issued/admin"
+  when: not admin_file.stat.exists
+
+- name: generate worker certificates
+  shell: "cfssl gencert -ca={{ ca_base }}/ca/ca.pem -ca-key={{ ca_base }}/ca/ca-key.pem -config={{ ca_base }}/config/ca-config.json -hostname={{ item.value.hostname }},{{ item.value.ipaddress }} -profile=kubernetes {{ ca_base}}/config/{{ item.value.hostname}}-csr.json | cfssljson -bare {{ ca_base }}/issued/{{ item.value.hostname }}"
+  with_dict: "{{ workers }}"
