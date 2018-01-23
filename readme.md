@@ -9,19 +9,22 @@ This repo contains the infrastructure I use to examine kubernetes the hard way, 
 
 the latter can be installed with `vagrant plugin install vagrant-hostmanager`
 
-# Easy of use
-login to client with `vagrant ssh client` and install tmux, git and pip
+# Ease of use
+login to client with `vagrant ssh client` and install Ansible
 
-`sudo apt install tmux git python-pip ansible`
+`sudo apt install ansible`
 
-Then install tmuxp
+Then apply the playbook for the client to install other dependencies.
 
-`pip install --user tmuxp`
+`ansible-playbook -i hosts  setup-client.yml`
 
-you can then do 
+you can then open a tmux window which has a connection to all the servers and the documentation, which makes the system easier to explore. Please note you need to start a new session before this works.
 
 `tmuxp load /vagrant/`
 
-to start a tmux session for studying all the hosts in the k8s cluster
+# Automated install with Ansible
+TBD
 
+# Disclaimers and further notes
+Inspired by [Kubernetes the hard Way](https://github.com/kelseyhightower/kubernetes-the-hard-way)
 Tested with [baslangenberg-dotfiles](https://github.com/BasLangenberg/dotfiles)

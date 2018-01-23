@@ -1,0 +1,86 @@
+---
+# tasks file for client
+- name: install dependencies
+  apt: name={{item}} state=present
+  with_items:
+    - tmux
+    - git
+    - python-pip
+    - ansible
+
+- name: Install tmuxp
+  pip: name=tmuxp extra_args=--user
+
+- name: add tmuxp to path
+  lineinfile:
+    path: /home/vagrant/.bashrc
+    line: 'PATH=${PATH}:~/.local/bin'
+
+- name : check if cfsll exists
+  stat:
+    path: /usr/local/bin/cfssl
+  register: cfssl_file
+
+- name : check if cfslljson exists
+  stat:
+    path: /usr/local/bin/cfssljson
+  register: cfssljson_file
+
+- name : check if kubectl exists
+  stat:
+    path: /usr/local/bin/kubectl
+  register: kubectl_file
+
+- name: download cfssl
+  get_url:
+    url: https://pkg.cfssl.org/R1.2/cfssl_linux-amd64
+    dest: /tmp/cfssl
+  when: not cfssl_file.stat.exists
+
+- name: download cfssljson
+  get_url:
+    url: https://pkg.cfssl.org/R1.2/cfssljson_linux-amd64
+    dest: /tmp/cfssljson
+  when: not cfssljson_file.stat.exists
+
+- name: download kubectl
+  get_url:
+    url: https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubectl
+    dest: /tmp/kubectl
+  when: not kubectl_file.stat.exists
+
+- name: copy cfssl
+  copy:
+    src: /tmp/cfssl
+    dest: /usr/local/bin/cfssl
+    remote_src: yes
+  when: not cfssl_file.stat.exists
+
+- name: copy cfssljson
+  copy:
+    src: /tmp/cfssljson
+    dest: /usr/local/bin/cfssljson
+    remote_src: yes
+  when: not cfssljson_file.stat.exists
+
+- name: copy kubectl
+  copy:
+    src: /tmp/kubectl
+    dest: /usr/local/bin/kubectl
+    remote_src: yes
+  when: not kubectl_file.stat.exists
+
+- name: set execute on cfssl
+  file:
+    path: /usr/local/bin/cfssl
+    mode: 0755
+
+- name: set execute on cfssljson
+  file:
+    path: /usr/local/bin/cfssljson
+    mode: 0755
+
+- name: set execute on kubectl
+  file:
+    path: /usr/local/bin/kubectl
+    mode: 0755

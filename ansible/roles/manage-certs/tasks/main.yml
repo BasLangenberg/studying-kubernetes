@@ -1,0 +1,29 @@
+---
+# tasks file for manage-certs
+
+- name: setup local CA
+  file:
+    path: "{{item}}"
+    state: directory
+  with_items:
+    - /etc/k8s-ca
+    - /etc/k8s-ca/ca
+    - /etc/k8s-ca/config
+    - /etc/k8s-ca/issued
+
+- name: copy ca config
+  copy:
+    src: "{{item}}"
+    dest: "/etc/k8s-ca/config/{{item}}" 
+  with_items:
+    - ca-config.json
+    - ca-csr.json
+
+- name : check if ca exists
+  stat:
+    path: /etc/k8s-ca/ca/ca.pem
+  register: ca_file
+
+- name: generate ca
+  shell: cfssl gencert -initca /etc/k8s-ca/config/ca-csr.json | cfssljson -bare /etc/k8s-ca/ca/ca
+  when: not ca_file.stat.exists

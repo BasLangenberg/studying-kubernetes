@@ -1,0 +1,24 @@
+[controllers]
+controller0
+controller1
+controller2
+
+[workers]
+worker0
+worker1
+worker2
+
+[loadbalancers]
+load-balancer
+
+[servers]
+load-balancer
+worker0
+worker1
+worker2
+controller0
+controller1
+controller2
+
+[local]
+client ansible_connection=local

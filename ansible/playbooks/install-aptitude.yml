@@ -1,0 +1,9 @@
+---
+- hosts: all
+  become: true
+  tasks:
+  - name: Install aptitude to make system compatible with Ansible APT module
+    raw: apt-get install python-minimal aptitude -y
+    become: true
+    become_user: root
+    become_method: sudo
